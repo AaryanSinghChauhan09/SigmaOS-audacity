@@ -1,50 +1,57 @@
-//! audacity model — audio editor.
+//! audacity model — audio editor/recorder.
 
 #[derive(Debug, Clone)]
-pub struct Track {
+pub struct Project {
     pub name: String,
-    pub type_: String,
-    pub samples: u64,
-    pub muted: bool,
+    pub tracks: Vec<String>,
+    pub duration: f64,
+    pub sample_rate: u32,
 }
 
 #[derive(Debug, Clone)]
 pub struct Model {
-    pub tracks: Vec<Track>,
-    pub selection_start: u64,
-    pub selection_end: u64,
+    pub projects: Vec<Project>,
 }
 
 impl Default for Model {
-    fn default() -> Self { Self { tracks: vec![], selection_start: 0, selection_end: 0 } }
+    fn default() -> Self { Self { projects: vec![] } }
 }
 
 impl Model {
     pub fn new() -> Self { Self::default() }
 
-    pub fn add_track(&mut self, track: Track) { self.tracks.push(track); }
-
-    pub fn select(&mut self, start: u64, end: u64) {
-        self.selection_start = start;
-        self.selection_end = end;
+    pub fn create(&mut self, name: &str, sample_rate: u32) -> usize {
+        let id = self.projects.len();
+        self.projects.push(Project { name: name.into(), tracks: vec![], duration: 0.0, sample_rate });
+        id
     }
 
-    pub fn export(&self, format: &str) -> bool {
-        !self.tracks.is_empty()
+    pub fn add_track(&mut self, project_id: usize, track_name: &str) -> bool {
+        if let Some(p) = self.projects.get_mut(project_id) {
+            p.tracks.push(track_name.into());
+            true
+        } else { false }
     }
 
-    pub fn list_tracks(&self) -> &[Track] { &self.tracks }
+    pub fn record(&mut self, project_id: usize, duration: f64) -> bool {
+        if let Some(p) = self.projects.get_mut(project_id) {
+            p.duration += duration;
+            true
+        } else { false }
+    }
+
+    pub fn list(&self) -> &[Project] { &self.projects }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     #[test]
-    fn track_select_export() {
+    fn create_track_record() {
         let mut a = Model::new();
-        a.add_track(Track { name: "vox".into(), type_: "audio".into(), samples: 44100, muted: false });
-        a.select(0, 22050);
-        assert!(a.export("wav"));
-        assert_eq!(a.list_tracks().len(), 1);
+        let id = a.create("song1", 44100);
+        assert!(a.add_track(id, "vocals"));
+        assert!(a.record(id, 30.0));
+        assert_eq!(a.projects[id].duration, 30.0);
     }
 }
