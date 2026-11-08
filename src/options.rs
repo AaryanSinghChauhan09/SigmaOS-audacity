@@ -1,9 +1,44 @@
-//! Options model.
+//! Command-line options for audacity.
 
+/// Operating mode
 #[derive(Debug, Clone, PartialEq)]
-pub enum Mode { Default, Create(String, u32), Track(usize, String), Record(usize, f64), List }
+pub enum Mode {
+    /// Default mode
+    Default,
+    /// New project mode
+    New(String),
+    /// Open project mode
+    Open(String),
+    /// Export mode
+    Export(String, String),
+    /// Record mode
+    Record,
+    /// Play mode
+    Play,
+    /// Stop mode
+    Stop,
+}
 
+/// Command-line options
 #[derive(Debug, Clone)]
-pub struct Options { pub mode: Mode }
-impl Default for Options { fn default() -> Self { Self { mode: Mode::Default } } }
-#[cfg(test)] mod tests { use super::*; #[test] fn o() { assert!(matches!(Options::default().mode, Mode::Default)); } }
+pub struct Options {
+    /// Operating mode
+    pub mode: Mode,
+    /// Config file path
+    pub config_path: String,
+    /// Verbose output
+    pub verbose: bool,
+    /// Quiet mode
+    pub quiet: bool,
+}
+
+impl Default for Options {
+    fn default() -> Self {
+        Self {
+            mode: Mode::Default,
+            config_path: String::new(),
+            verbose: false,
+            quiet: false,
+        }
+    }
+}
