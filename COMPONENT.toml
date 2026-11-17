@@ -3,7 +3,7 @@ name = "SigmaOS-audacity"
 tier = 2
 stability = "scaffold"
 language = "rust"
-description = "audacity component"
+description = "No GitHub description is set; component scope remains unclassified."
 upstream = []
 
 [contract]
