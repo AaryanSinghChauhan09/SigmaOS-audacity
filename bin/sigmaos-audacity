@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# sigmaos-audacity — SigmaOS helper for audacity.
+set -euo pipefail
+APP="audacity"
+cmd="${1:-status}"
+case "$cmd" in
+  launch)  xdg-open "$(command -v $APP || command -v ${APP}bin || echo /usr/bin/$APP)" 2>/dev/null || echo "$APP not installed";;
+  config)  echo "config dir: $HOME/.config/AUDACITY"; ls "$HOME/.config/AUDACITY" 2>/dev/null | head;;
+  reset)   echo "remove $HOME/.config/AUDACITY to reset $APP";;
+  *) echo "usage: sigmaos-audacity launch|config|reset" >&2; exit 2;;
+esac
